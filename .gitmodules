@@ -1,0 +1,16 @@
+[submodule "dependencies/DynamixelSDK"]
+	path = dependencies/DynamixelSDK
+	url = https://github.com/ROBOTIS-GIT/DynamixelSDK.git
+	branch = humble
+[submodule "dependencies/turtlebot3"]
+	path = dependencies/turtlebot3
+	url = https://github.com/ROBOTIS-GIT/turtlebot3.git
+	branch = humble
+[submodule "dependencies/turtlebot3_msgs"]
+	path = dependencies/turtlebot3_msgs
+	url = https://github.com/ROBOTIS-GIT/turtlebot3_msgs.git
+	branch = humble
+[submodule "dependencies/turtlebot3_simulations"]
+	path = dependencies/turtlebot3_simulations
+	url = https://github.com/ROBOTIS-GIT/turtlebot3_simulations.git
+	branch = humble
