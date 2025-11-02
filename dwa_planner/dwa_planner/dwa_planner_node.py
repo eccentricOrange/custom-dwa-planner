@@ -325,7 +325,7 @@ class DwaPlanner(Node):
         
         # Get the angle from the end of each path to the goal
         angle_to_goal = np.arctan2(goal_y - final_y, goal_x - final_x)
-        heading_error = np.abs(self._normalize_angle_vectorized(angle_to_goal - final_yaw))
+        heading_error = np.abs(np.clip((angle_to_goal - final_yaw), -2 * np.pi, 2 * np.pi))
         goal_cost = heading_error / pi # Normalize cost to [0, 1]
 
         # --- Obstacle Cost ---
@@ -470,21 +470,9 @@ class DwaPlanner(Node):
             orientation.z,
             orientation.w,
         )
-        _, _, yaw = tf_transformations.euler_from_quaternion(quaternion)
-        return yaw
-    
-    def normalize_angle(self, angle: float) -> float:
-        """Normalize an angle to the range [-pi, pi]."""
-        while angle > pi:
-            angle -= 2.0 * pi
-        while angle < -pi:
-            angle += 2.0 * pi
-        return angle
+        euler = tf_transformations.euler_from_quaternion(quaternion)
+        return euler[2]
 
-    def _normalize_angle_vectorized(self, angles: np.ndarray) -> np.ndarray:
-        """Normalize a numpy array of angles to the range [-pi, pi]."""
-        angles = (angles + np.pi) % (2.0 * np.pi) - np.pi
-        return angles
 
     # Visualization
 
