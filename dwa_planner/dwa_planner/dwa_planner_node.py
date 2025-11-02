@@ -241,7 +241,7 @@ class DwaPlanner(Node):
         
         return samples
 
-    def evaluate_trajectories(self, samples: np.ndarray, all_trajectories_np: np.ndarray, obstacle_points_np: np.ndarray, goal_in_base_link) -> tuple[np.ndarray, float, list, list]:
+    def evaluate_trajectories(self, samples: np.ndarray, all_trajectories_np: np.ndarray, obstacle_points_np: np.ndarray, goal_in_base_link) -> tuple[np.ndarray, float, np.ndarray, np.ndarray]:
         """
         Vectorized evaluation of all trajectories for collision and scoring.
         """
@@ -270,8 +270,8 @@ class DwaPlanner(Node):
         # Prepare lists for visualization
         safe_indices = ~is_collision
         unsafe_indices = is_collision
-        safe_trajs = all_trajectories_np[safe_indices].tolist()
-        unsafe_trajs = all_trajectories_np[unsafe_indices].tolist()
+        safe_trajs = all_trajectories_np[safe_indices]
+        unsafe_trajs = all_trajectories_np[unsafe_indices]
 
         return best_cmd, best_score, safe_trajs, unsafe_trajs
 
@@ -476,7 +476,7 @@ class DwaPlanner(Node):
 
     # Visualization
 
-    def publish_trajectories(self, safe_trajs: list, unsafe_trajs: list):
+    def publish_trajectories(self, safe_trajs: np.ndarray, unsafe_trajs: np.ndarray):
         """
         Publishes all evaluated trajectories as a MarkerArray for RViz.
         """
