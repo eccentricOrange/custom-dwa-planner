@@ -35,12 +35,20 @@ def generate_launch_description():
         default_value='false',
         description='Whether to launch the keyboard teleoperation node',
     )
+    # 1. NEW: Add use_sim_time argument
+    use_sim_time_arg = DeclareLaunchArgument(
+        'use_sim_time',
+        default_value='true', # Default to 'true' for simulation
+        description='Use simulation (Gazebo) clock',
+    )
     
     # --- Environment Variables ---
-    # Set the TurtleBot3 model for all nodes
     set_model_env = SetEnvironmentVariable(
         name='TURTLEBOT3_MODEL', value='burger'
     )
+    
+    # Get the use_sim_time configuration
+    use_sim_time = LaunchConfiguration('use_sim_time')
 
     # --- Node Definitions ---
 
@@ -50,7 +58,8 @@ def generate_launch_description():
         executable='dwa_planner_node',
         name='dwa_planner_node',
         output='screen',
-        parameters=[str(dwa_params_file)],
+        # 2. NEW: Pass use_sim_time to the node
+        parameters=[str(dwa_params_file), {'use_sim_time': use_sim_time}],
     )
 
     # 2. RViz Node
@@ -60,22 +69,27 @@ def generate_launch_description():
         name='rviz2',
         arguments=['-d', str(rviz_config_file)],
         output='screen',
+        # 3. NEW: Pass use_sim_time to RViz
+        parameters=[{'use_sim_time': use_sim_time}],
     )
 
     # 3. Gazebo Simulation (Conditional)
     gazebo_sim = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(str(sim_launch_file)),
+        # 4. NEW: Pass use_sim_time to the included sim launch file
+        launch_arguments={'use_sim_time': use_sim_time}.items(),
         condition=IfCondition(LaunchConfiguration('launch_sim')),
     )
 
     # 4. Keyboard Teleop (Conditional)
-    
     teleop_node = Node(
         package='turtlebot3_teleop',
         executable='teleop_keyboard',
         name='teleop_keyboard',
-        prefix='xterm -e',  # Launch in a new terminal window
+        prefix='xterm -e',
         output='screen',
+        # Teleop doesn't need sim time, but it's good practice
+        parameters=[{'use_sim_time': use_sim_time}],
         condition=IfCondition(LaunchConfiguration('launch_teleop')),
     )
 
@@ -84,6 +98,7 @@ def generate_launch_description():
             # Launch Arguments
             launch_sim_arg,
             launch_teleop_arg,
+            use_sim_time_arg, # NEW
             
             # Environment
             set_model_env,
