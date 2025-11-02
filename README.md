@@ -50,12 +50,12 @@ The core DWA evaluation pipeline uses `numpy` vectorization to avoid slow Python
 
 2.  **Check for Collisions**
 
-    Calculates the minimum distance from each trajectory to the nearest obstacle. If this distance is less than the robot_radius, the trajectory is marked as invalid.
+    Calculates the minimum distance from each trajectory to the nearest obstacle. If this distance is less than the $\text{robot radius}$, the trajectory is marked as invalid.
     
-    $$\text{min\_dist} < \text{robot\_radius}$$
+    $$\text{min dist} < \text{robot radius}$$
 
 3.  **Score Trajectories**
 
     Selects the best command by finding the trajectory with the lowest total cost, calculated as a weighted sum of three factors.
 
-    $$\text{Cost} = \alpha \cdot \text{goal\_cost} + \beta \cdot \text{obstacle\_cost} + \gamma \cdot \text{velocity\_cost}$$
+    $$\text{Cost} = \alpha \cdot \text{goal cost} + \beta \cdot \text{obstacle cost} + \gamma \cdot \text{velocity cost}$$
