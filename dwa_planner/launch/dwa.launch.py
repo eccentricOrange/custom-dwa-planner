@@ -9,22 +9,22 @@ from launch.actions import (
 )
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
-from launch.conditions import IfCondition
+from launch.conditions import IfCondition, UnlessCondition
 
 
 def generate_launch_description():
 
-    # --- Get Package Directories ---
+    # Get package directories
     pkg_dwa_planner = get_package_share_directory('dwa_planner')
     pkg_turtlebot3_gazebo = get_package_share_directory('turtlebot3_gazebo')
     pkg_turtlebot3_teleop = get_package_share_directory('turtlebot3_teleop')
 
-    # --- Paths ---
+    # Get path to config files
     dwa_params_file = Path(pkg_dwa_planner) / 'config' / 'dwa_params.yaml'
     rviz_config_file = Path(pkg_dwa_planner) / 'rviz' / 'dwa_debug.rviz'
     sim_launch_file = Path(pkg_turtlebot3_gazebo) / 'launch' / 'turtlebot3_world.launch.py'
     
-    # --- Launch Arguments ---
+    # Declare launch arguments
     launch_sim_arg = DeclareLaunchArgument(
         'launch_sim',
         default_value='true',
@@ -35,62 +35,58 @@ def generate_launch_description():
         default_value='false',
         description='Whether to launch the keyboard teleoperation node',
     )
-    # 1. NEW: Add use_sim_time argument
     use_sim_time_arg = DeclareLaunchArgument(
         'use_sim_time',
-        default_value='true', # Default to 'true' for simulation
+        default_value='true',
         description='Use simulation (Gazebo) clock',
     )
     
-    # --- Environment Variables ---
+    # Set TURTLEBOT3_MODEL environment variable
     set_model_env = SetEnvironmentVariable(
         name='TURTLEBOT3_MODEL', value='burger'
     )
     
-    # Get the use_sim_time configuration
+    # Get the launch configurations
     use_sim_time = LaunchConfiguration('use_sim_time')
+    launch_teleop = LaunchConfiguration('launch_teleop')
 
-    # --- Node Definitions ---
-
-    # 1. DWA Planner Node (Your "Brain")
+    # DWA Planner Node
     dwa_planner_node = Node(
         package='dwa_planner',
         executable='dwa_planner_node',
         name='dwa_planner_node',
         output='screen',
-        # 2. NEW: Pass use_sim_time to the node
         parameters=[str(dwa_params_file), {'use_sim_time': use_sim_time}],
+        # Don't launch the DWA planner if teleop is enabled (to avoid conflicts)
+        condition=UnlessCondition(launch_teleop),
     )
 
-    # 2. RViz Node
+    # RViz Node
     rviz_node = Node(
         package='rviz2',
         executable='rviz2',
         name='rviz2',
         arguments=['-d', str(rviz_config_file)],
         output='screen',
-        # 3. NEW: Pass use_sim_time to RViz
         parameters=[{'use_sim_time': use_sim_time}],
     )
 
-    # 3. Gazebo Simulation (Conditional)
+    # Gazebo Simulation
     gazebo_sim = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(str(sim_launch_file)),
-        # 4. NEW: Pass use_sim_time to the included sim launch file
         launch_arguments={'use_sim_time': use_sim_time}.items(),
         condition=IfCondition(LaunchConfiguration('launch_sim')),
     )
 
-    # 4. Keyboard Teleop (Conditional)
+    # Keyboard Teleop
     teleop_node = Node(
         package='turtlebot3_teleop',
         executable='teleop_keyboard',
         name='teleop_keyboard',
-        prefix='xterm -e',
+        prefix='xterm -e', # Launch in a new terminal window
         output='screen',
-        # Teleop doesn't need sim time, but it's good practice
         parameters=[{'use_sim_time': use_sim_time}],
-        condition=IfCondition(LaunchConfiguration('launch_teleop')),
+        condition=IfCondition(launch_teleop),
     )
 
     return LaunchDescription(
@@ -98,7 +94,7 @@ def generate_launch_description():
             # Launch Arguments
             launch_sim_arg,
             launch_teleop_arg,
-            use_sim_time_arg, # NEW
+            use_sim_time_arg,
             
             # Environment
             set_model_env,
@@ -110,4 +106,3 @@ def generate_launch_description():
             rviz_node,
         ]
     )
-
