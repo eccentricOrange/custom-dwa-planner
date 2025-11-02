@@ -38,6 +38,22 @@ ros2 launch dwa_planner dwa.launch.py
 
 ## Implementation details
 
+This is a simple implementation of the original Dynamic Window Approach (DWA) algorithm for local path planning in mobile robots. The implementation is based on the original paper:
+
+```bibtex
+@ARTICLE{dwa-fox1997,
+  author={Fox, D. and Burgard, W. and Thrun, S.},
+  journal={IEEE Robotics & Automation Magazine}, 
+  title={The dynamic window approach to collision avoidance}, 
+  year={1997},
+  volume={4},
+  number={1},
+  pages={23-33},
+  keywords={Collision avoidance;Mobile robots;Robot sensing systems;Orbital robotics;Robotics and automation;Motion control;Humans;Robot control;Motion planning;Acceleration},
+  doi={10.1109/100.580977}
+}
+```
+
 ### High-Performance Vectorized Logic
 The core DWA evaluation pipeline uses `numpy` vectorization to avoid slow Python for loops. The entire process of trajectory prediction, collision checking, and scoring is performed "all-at-once" on large arrays. This vectorized approach allows it to evaluate thousands of trajectories ($50 \times 50 = 2500$ in the config) in real-time.
 
@@ -61,3 +77,4 @@ The core DWA evaluation pipeline uses `numpy` vectorization to avoid slow Python
     Selects the best command by finding the trajectory with the lowest total cost, calculated as a weighted sum of three factors.
 
     $$\text{Cost} = \alpha \cdot \text{goal cost} + \beta \cdot \text{obstacle cost} + \gamma \cdot \text{velocity cost}$$
+
