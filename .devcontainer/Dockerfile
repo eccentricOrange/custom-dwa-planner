@@ -6,11 +6,9 @@ FROM ros:$ROS_DISTRO-ros-base
 ## Config args
 ARG USERNAME=ros
 ARG WORKSPACE=/home/$USERNAME/dwa_ws
-# <<< FIX: Add ARGs for user/group IDs to match your host machine
 ARG USER_UID=1000
 ARG USER_GID=1000
 
-# <<< FIX: Create the non-root user with matching UID/GID
 RUN groupadd -g $USER_GID $USERNAME \
     && useradd -u $USER_UID -g $USER_GID -m -d /home/$USERNAME -s /bin/bash $USERNAME
 
@@ -78,16 +76,10 @@ SHELL ["/bin/bash", "-c"]
 RUN usermod -aG dialout $USERNAME
 RUN usermod -aG video $USERNAME
 
-# <<< FIX: Remove 'rosdep init'. It's already run in the base image and will cause an error.
-# RUN rosdep init
-
-# <<< FIX: Switch to the user *before* running 'rosdep update'
-# This ensures the rosdep cache is in /home/ros/ not /root/
+## Set username
 USER $USERNAME
 RUN rosdep update
 
-## Set username
-# USER $USERNAME  <-- This is now redundant, we already switched
 
 ## Set variables
 ENV ROS_DISTRO=$ROS_DISTRO
@@ -130,7 +122,6 @@ RUN apt-get install --no-install-recommends -y \
     ros-$ROS_DISTRO-joint-state-publisher-gui \
     ros-$ROS_DISTRO-plotjuggler-ros
 
-# <<< FIX: Final switch back to the 'ros' user
 USER $USERNAME
 WORKDIR $WORKSPACE
 
