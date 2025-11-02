@@ -8,7 +8,8 @@
     "privileged": true,
 
     "containerEnv": {
-        "DISPLAY": "${localEnv:DISPLAY}"
+        "DISPLAY": "${localEnv:DISPLAY}",
+        "TURTLEBOT3_MODEL": "burger"
     },
 
     "remoteUser": "ros",

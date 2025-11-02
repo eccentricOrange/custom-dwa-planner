@@ -8,7 +8,7 @@ source /opt/ros/$ROS_DISTRO/setup.bash
 
 # install dependencies
 cd $WORKSPACE && \
-sudo apt update -y && \rm -
+sudo apt update -y && \
 rosdep update
 
 
@@ -27,3 +27,4 @@ colcon build --symlink-install
 
 # source script for convenience functions
 echo "source $WORKSPACE/src/config/scripts/convenience_functions.sh" >> ~/.bashrc
+echo "source /usr/share/gazebo/setup.sh" >> ~/.bashrc

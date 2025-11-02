@@ -1,0 +1,23 @@
+# Parameters for the DWA Planner
+dwa_planner_node:
+  ros__parameters:
+    # Robot physical constraints
+    max_linear_speed: 1.0     # m/s
+    min_linear_speed: 0.0     # m/s
+    max_angular_speed: 2.0    # rad/s
+    max_linear_accel: 1.0     # m/s^2
+    max_angular_accel: 3.5    # rad/s^2
+    
+    # Trajectory simulation parameters
+    predict_time: 2.0         # seconds
+    time_step: 0.1            # simulation time step, s
+    num_velocity_samples: 11  # Number of linear velocities to sample
+    num_angle_samples: 21     # Number of angular velocities to sample
+
+    # Cost function weights (alpha, beta, gamma)
+    goal_cost_weight: 1.0
+    obstacle_cost_weight: 2.0
+    velocity_cost_weight: 0.1
+    
+    # Robot footprint / collision checking
+    robot_radius: 0.17 # meters
