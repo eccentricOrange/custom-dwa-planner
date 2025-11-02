@@ -48,6 +48,8 @@ The core DWA evaluation pipeline uses `numpy` vectorization to avoid slow Python
 
     $$v_r \in [\max(v_c - a_l \cdot \mathrm{d}t, v_{min}), \min(v_c + a_l \cdot \mathrm{d}t, v_{max})]$$
 
+    $$\omega_r \in [\max(\omega_c - a_a \cdot \mathrm{d}t, (-\omega_{max})), \min(\omega_c + a_a \cdot \mathrm{d}t, \omega_{max})]$$
+
 2.  **Check for Collisions**
 
     Calculates the minimum distance from each trajectory to the nearest obstacle. If this distance is less than the $\text{robot radius}$, the trajectory is marked as invalid.
